@@ -1,9 +1,9 @@
 import axios from "axios";
 import { Link } from "react-router";
 import Loading from "../compontents/Loading";
-import { useEffect,useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { removeCart, addCart, clearCart } from '../stores/cartStore';
+import { removeCart, addCart, clearCart, initCarts, initFinal_total, initTotal } from '../stores/cartStore';
 import { createAsyncMsg } from "../stores/toastStore";
 
 const updateAxios = (token) => {
@@ -21,6 +21,27 @@ export default function Carts() {
   if (token) {
     updateAxios(token);
   }
+
+  const initCart = useCallback(async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE}/v2/api/${import.meta.env.VITE_API_PATH}/cart`,
+      );
+      if (res.data.success) {
+        dispatch(initCarts(res.data.data.carts));
+        dispatch(initFinal_total(res.data.data.final_total));
+        dispatch(initTotal(res.data.data.total));
+      }
+    } catch (error) {
+      dispatch(createAsyncMsg({ success: false, id: new Date().getTime(), message: '取得購物車失敗' + error }));
+    }
+  }, [dispatch])
+
+  useEffect(() => {
+    if (state.isAdd){
+      initCart();
+    }
+  }, [initCart,state.isAdd]);
 
   useEffect(() => {
     if (!token) return;
@@ -138,10 +159,7 @@ export default function Carts() {
             <p className='mb-0 h4 fw-bold'>總金額</p>
             <p className='mb-0 h4 fw-bold'>
               NT$
-              {state?.carts.reduce(function (a, b) {
-                a += b.qty * b.product.price;
-                return a;
-              }, 0)}
+                {state?.total}
             </p>
           </div>
           <div className="row row-cols-2 g-0 mt-3">

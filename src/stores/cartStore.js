@@ -5,6 +5,9 @@ export const carts = createSlice({
   initialState: {
     carts: [],
     isLoading: true,
+    isAdd:false,
+    total:0,
+    final_total:0,
   },
   reducers: {
     addCart(state, action) {
@@ -18,11 +21,12 @@ export const carts = createSlice({
           }
           return item;
         });
-        return { ...state, carts: newCarts };
+        return { ...state, isAdd: true, carts: newCarts };
       } else {
         return {
           ...state,
           carts: [...state.carts, action.payload],
+          isAdd:true,
         }
       }
     },
@@ -41,9 +45,21 @@ export const carts = createSlice({
         isLoading: false,
       };
     },
+    initTotal(state, action) {
+      return {
+        ...state,
+        total: action.payload,
+      }
+    },
+    initFinal_total(state,action){
+      return {
+        ...state,
+        final_total: action.payload,
+      }
+    }
   }
 });
 
-export const { addCart, removeCart, clearCart, initCarts } = carts.actions;
+export const { addCart, removeCart, clearCart, initCarts, initFinal_total, initTotal } = carts.actions;
 
 export default carts.reducer;

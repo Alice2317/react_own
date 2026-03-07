@@ -2,7 +2,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router";
 import { useEffect, useState,useCallback } from "react";
 import { useSelector, useDispatch } from 'react-redux';
-import { initCarts } from "../stores/cartStore";
+import { initCarts,initFinal_total,initTotal } from "../stores/cartStore";
 import { createAsyncMsg } from "../stores/toastStore";
 
 const updateAxios = (token) => {
@@ -27,9 +27,13 @@ export default function Header() {
       const res = await axios.get(
         `${import.meta.env.VITE_API_BASE}/v2/api/${import.meta.env.VITE_API_PATH}/cart`,
       );
-      dispatch(initCarts(res.data.data.carts));
+      if (res.data.success){
+        dispatch(initCarts(res.data.data.carts));
+        dispatch(initFinal_total(res.data.data.final_total));
+        dispatch(initTotal(res.data.data.total));
+      }
     } catch (error) {
-      dispatch(createAsyncMsg({ error }))
+      dispatch(createAsyncMsg({ success: false, id: new Date().getTime(), message: '取得購物車失敗' + error }));
     }
   }, [dispatch])
 
@@ -59,7 +63,7 @@ export default function Header() {
       setisAuth(false);
       navigate("/");
     } catch (error) {
-      alert('登出失敗'+error);
+      dispatch(createAsyncMsg({ success: false, id: new Date().getTime(), message: '登出失敗' + error }));
     }
   };
 

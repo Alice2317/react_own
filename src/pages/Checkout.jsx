@@ -5,13 +5,14 @@ import { useState } from "react";
 import { useDispatch,useSelector } from 'react-redux';
 import { InputDom } from "../compontents/FormEelements";
 import Loading from "../compontents/Loading";
-import { clearCart } from '../stores/cartStore';
+import { clearCart, initFinal_total } from '../stores/cartStore';
 import { createAsyncMsg } from "../stores/toastStore";
 
 
 export default function Checkout() {
   const dispatch = useDispatch();
   const [isLoading,setIsLoading] = useState(false);
+  const [coupon,setCoupon] = useState('');
   const state = useSelector((state) => state.carts);
   const navigate = useNavigate();
   const {
@@ -21,6 +22,26 @@ export default function Checkout() {
   } = useForm({
     mode: "onTouched",
   });
+
+  const postCoupon = async () => {
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE}/v2/api/${import.meta.env.VITE_API_PATH}/coupon`,
+        {
+          data: {
+            code: coupon
+          }
+        }
+      );
+      
+      if (res.data.success) {
+        dispatch(initFinal_total(res.data.data.final_total));
+        dispatch(createAsyncMsg({ success: res.data.success, id: new Date().getTime(), message: '已使用折扣' }));
+      }
+    } catch (error) {
+      dispatch(createAsyncMsg({ success: false, id: new Date().getTime(), message: '折扣失敗' + error }));
+    }
+  };
 
   const pay = async (orderId) => {
     try {
@@ -240,6 +261,18 @@ export default function Checkout() {
             </form>
           </div>
           <div className='col-md-4'>
+            <p className="mb-0">折扣碼</p>
+            <div className='d-flex justify-content-between'>
+              <input type="text" className="form-control" defaultValue={coupon} onBlur={(e)=>setCoupon(e.target.value)} />
+              <button
+                type='button'
+                className='btn btn-primary text-nowrap ms-1'
+                onClick={()=>postCoupon()}
+              >
+                送出
+              </button>
+            </div>
+            <hr />
             <div className='border p-4 mb-4'>
               <h4 className='mb-4'>商品詳細</h4>
               {state.carts?.map((item) => (
@@ -260,13 +293,24 @@ export default function Checkout() {
                 </div>
               ))}
               <div className='d-flex justify-content-between mt-4'>
+                <p className='mb-0 h6 fw-bold'>小計</p>
+                <p className='mb-0 h6 fw-bold'>
+                  NT$
+                  {state.total}
+                </p>
+              </div>
+              <div className='d-flex justify-content-between mt-4'>
+                <p className='mb-0 h6 fw-bold'>折扣碼</p>
+                <p className='mb-0 h6 fw-bold'>
+                  NT$
+                  {state.final_total - state.total}
+                </p>
+              </div>
+              <div className='d-flex justify-content-between mt-4'>
                 <p className='mb-0 h4 fw-bold'>總金額</p>
                 <p className='mb-0 h4 fw-bold'>
                   NT$
-                  {state?.carts.reduce(function (a, b) {
-                    a += b.qty * b.product.price;
-                    return a;
-                  }, 0)}
+                  {state.final_total}
                 </p>
               </div>
             </div>
