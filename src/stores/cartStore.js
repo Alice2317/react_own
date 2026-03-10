@@ -11,22 +11,20 @@ export const carts = createSlice({
   },
   reducers: {
     addCart(state, action) {
-      let addIndex = state.carts.findIndex(item => item.product_id === action.payload.product_id);
-
+      let addIndex = state.carts.findIndex(item => item.id === action.payload.product_id);
       // 避免重複的產品
-      if (addIndex > -1) {
+      if (addIndex !== -1) {
         let newCarts = state.carts.map((item, index) => {
           if (index === addIndex) {
             return { ...item, qty: action.payload.qty };
           }
           return item;
         });
-        return { ...state, isAdd: true, carts: newCarts };
+        return { ...state, carts: newCarts };
       } else {
         return {
           ...state,
-          carts: [...state.carts, action.payload],
-          isAdd:true,
+          carts: [...state.carts, action.payload]
         }
       }
     },
@@ -56,10 +54,13 @@ export const carts = createSlice({
         ...state,
         final_total: action.payload,
       }
-    }
+    },
+    changeAdd(state,action){
+      state.isAdd = action.payload;
+    },
   }
 });
 
-export const { addCart, removeCart, clearCart, initCarts, initFinal_total, initTotal } = carts.actions;
+export const { addCart, removeCart, clearCart, initCarts, initFinal_total, initTotal, changeAdd } = carts.actions;
 
 export default carts.reducer;

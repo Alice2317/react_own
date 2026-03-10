@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Link } from "react-router";
 import Loading from "../compontents/Loading";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { removeCart, addCart, clearCart, initCarts, initFinal_total, initTotal } from '../stores/cartStore';
 import { createAsyncMsg } from "../stores/toastStore";
@@ -12,7 +12,6 @@ const updateAxios = (token) => {
 
 export default function Carts() {
   const dispatch = useDispatch();
-  const [isAuth, setisAuth] = useState(false);
   const state = useSelector((state) => state.carts);
   const token = document.cookie.replace(
     /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
@@ -42,15 +41,6 @@ export default function Carts() {
       initCart();
     }
   }, [initCart,state.isAdd]);
-
-  useEffect(() => {
-    if (!token) return;
-    const update = ()=>{
-      setisAuth(true);
-      updateAxios(token);
-    }
-    update();
-  }, [token]);
 
   const removeCartItem = async (id) => {
     try {
@@ -159,7 +149,12 @@ export default function Carts() {
             <p className='mb-0 h4 fw-bold'>總金額</p>
             <p className='mb-0 h4 fw-bold'>
               NT$
-                {state?.total}
+                {
+                  state?.carts?.reduce((a, b) => {
+                    a += b.qty * b.product.price;
+                    return a
+                  }, 0)
+                }
             </p>
           </div>
           <div className="row row-cols-2 g-0 mt-3">
@@ -173,23 +168,13 @@ export default function Carts() {
               </button>
             </div>
             <div className="col">
-              {!isAuth ? (
-                <Link to='/login'>
-                  <button
-                    type='button'
-                    className='btn btn-dark rounded-0 w-100'
-                  >
-                    請先登入後結帳
-                  </button>
-                </Link>
-              ) : (
                 <Link
                   to='/checkout'
                   className='btn btn-dark rounded-0 w-100'
+                  onClick={()=>initCart()}
                 >
                   確認購物車
                 </Link>
-              )}
             </div>
           </div>
         </div>

@@ -102,24 +102,17 @@ export default function Home() {
           <i className='bi bi-caret-right-fill'></i>
         </span>
       </div>
-      <div className='row'>
+      <div className='row g-2 mb-5'>
         {hotProducts.map((item) => {
           return (
-            <div className='col col-md-4 mt-md-4' key={item.id}>
-              <div className='card border-0 mb-4 position-relative'>
-                <img
-                  src={item.imageUrl}
-                  className='card-img-top rounded-0'
-                  alt='主圖'
-                />
-                <div className='card-body p-0'>
-                  <div className='d-flex justify-content-between align-items-center px-2 mt-3'>
-                    <h4>{item.title}</h4>
-                    <p className='card-text text-muted mb-0'>
-                      NT$ {item.price}
-                    </p>
-                  </div>
-                </div>
+            <div className='col-12 col-sm-6 col-md-4 mt-md-4' key={item.id}>
+              <img src={item.imageUrl}
+                    className='img-fluid'
+                    alt='主圖'
+                  />
+              <div className="d-block d-md-flex justify-content-md-between align-items-md-center">
+                <h4 className="mt-2">{item.title}</h4>
+                <small>NT$ {item.price}</small>
               </div>
             </div>
           );
@@ -129,17 +122,13 @@ export default function Home() {
         <h2 className='text-center fw-bold'>最新評價</h2>
         ++++++
       </div>
-      <div className='row mb-5'>
+      <div className='row g-2 mb-5'>
         {articles.map((item) => {
           return (
-            <div className='col col-md-4 mt-md-4' key={item.id}>
-              <div className='card border-0'>
-                <img
-                  src={item.image}
-                  className='card-img opacity-50 h-250'
-                  alt='作者'
-                />
-                <div className='card-img-overlay'>
+            <div className='col-12 col-sm-6 col-md-4' key={item.id}>
+              <div className="card border-0 rounded-0">
+                <img src={item.image} className="card-img h-250 opacity-50" alt="作者" />
+                <div className="card-img-overlay">
                   <h5 className='card-title'>{item.title}</h5>
                   <p className='card-text'>{item.description}</p>
                   <p className='card-text'>{item.author}</p>

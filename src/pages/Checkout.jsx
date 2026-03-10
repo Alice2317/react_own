@@ -35,7 +35,7 @@ export default function Checkout() {
       );
       
       if (res.data.success) {
-        dispatch(initFinal_total(res.data.data.final_total));
+        dispatch(initFinal_total(Math.round(res.data.data.final_total)));
         dispatch(createAsyncMsg({ success: res.data.success, id: new Date().getTime(), message: '已使用折扣' }));
       }
     } catch (error) {
@@ -98,8 +98,8 @@ export default function Checkout() {
     <div className='bg-light py-5'>
       {isLoading && <Loading title='付款中，請耐心等候..' />}
       <div className='container'>
-        <div className='row justify-content-center flex-md-row flex-column-reverse'>
-          <div className='col-md-6'>
+        <div className='row justify-content-center flex-column-reverse flex-lg-row'>
+          <div className='col-12 col-lg-6'>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className='bg-white p-4'>
                 <h4 className='fw-bold'>填寫資料</h4>
@@ -260,7 +260,7 @@ export default function Checkout() {
               </div>
             </form>
           </div>
-          <div className='col-md-4'>
+          <div className='col-12 col-lg-4'>
             <p className="mb-0">折扣碼</p>
             <div className='d-flex justify-content-between'>
               <input type="text" className="form-control" defaultValue={coupon} onBlur={(e)=>setCoupon(e.target.value)} />
@@ -282,7 +282,7 @@ export default function Checkout() {
                     className='me-2 w-160'
                   />
                   <div className='w-100'>
-                    <div className='d-flex justify-content-between fw-bold'>
+                    <div className='d-flex flex-wrap justify-content-between fw-bold'>
                       <p className='mb-0'>{item.product.title}</p>
                       <p className='mb-0'>x{item.qty}</p>
                     </div>

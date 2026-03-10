@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { useDispatch,useSelector } from 'react-redux';
-import {addCart} from '../stores/cartStore';
+import { addCart, changeAdd } from '../stores/cartStore';
 import { createAsyncMsg } from "../stores/toastStore";
 
 export default function ProductDetail() {
@@ -53,6 +53,7 @@ export default function ProductDetail() {
       });
       if(res.data.success){
         dispatch(addCart(res.data.data));
+        dispatch(changeAdd(true));
         dispatch(createAsyncMsg({ success: true, id: new Date().getTime(), message :'成功加入購物車'}));
         setLoading(false);
       }
