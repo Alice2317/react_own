@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Link } from "react-router";
 import Loading from "../compontents/Loading";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback,useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { removeCart, addCart, clearCart, initCarts, initFinal_total, initTotal } from '../stores/cartStore';
 import { createAsyncMsg } from "../stores/toastStore";
@@ -13,6 +13,7 @@ const updateAxios = (token) => {
 export default function Carts() {
   const dispatch = useDispatch();
   const state = useSelector((state) => state.carts);
+  const [isShowLoading, setShowLoading] = useState(false);
   const token = document.cookie.replace(
     /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
     "$1",
@@ -43,19 +44,23 @@ export default function Carts() {
   }, [initCart,state.isAdd]);
 
   const removeCartItem = async (id) => {
+    setShowLoading(true);
     try {
       const res = await axios.delete(
         `${import.meta.env.VITE_API_BASE}/v2/api/${import.meta.env.VITE_API_PATH}/cart/${id}`,
       );
       if (res.data.success) {
         dispatch(removeCart(id));
+        setShowLoading(false);
       }
     } catch (error) {
+      setShowLoading(false);
       dispatch(createAsyncMsg({ success: false, id: new Date().getTime(), message: '刪除產品失敗'+error }));
     }
   };
 
   const updateCartItem = async (id, num) => {
+    setShowLoading(true);
     try {
       const res = await axios.put(
         `${import.meta.env.VITE_API_BASE}/v2/api/${import.meta.env.VITE_API_PATH}/cart/${id}`,
@@ -68,25 +73,31 @@ export default function Carts() {
       );
       if (res.data.success) {
         dispatch(addCart(res.data.data));
+        setShowLoading(false);
       }
     } catch (error) {
+      setShowLoading(false);
       dispatch(createAsyncMsg({ success: false, id: new Date().getTime(), message: '更新產品失敗'+error }));
     }
   };
 
   const clearCarts = async () => {
+    setShowLoading(true);
     try {
       const res = await axios.delete(
         `${import.meta.env.VITE_API_BASE}/v2/api/${import.meta.env.VITE_API_PATH}/carts`,
       );
       if (res.data.success) {
         dispatch(clearCart());
+        setShowLoading(false);
         dispatch(createAsyncMsg({ success: true, id: new Date().getTime(), message: '已清空購物車' }));
       }
     } catch (error) {
-      dispatch(createAsyncMsg({ success: false, id: new Date().getTime(), message: '請重新操作'+error }));
+      setShowLoading(false);
+      dispatch(createAsyncMsg({ success: false, id: new Date().getTime(), message: '請重新操作' + error }));
     }
   };
+  
 
   return !state.isLoading ? (
     state.carts.length === 0 ? (
@@ -100,6 +111,9 @@ export default function Carts() {
       </div>
     ) : (
       <div className='container py-5'>
+        {
+          isShowLoading ? <Loading title='正在操作中...' /> : ''
+        }
         <div className='mx-auto cartWrapper'>
           <div className='d-flex justify-content-between'>
             <h2>購物車</h2>

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import PropTypes from 'prop-types';
 
@@ -17,10 +17,13 @@ const defaultData = {
 };
 
 export default function AddProduct({ eventHide, getProducts, action, tempProduct }) {
+  const [imageType, setImageType] = useState('imageUrl');
+  const [imagesPath, setImagesPath] = useState('');
   const {
     register,
     handleSubmit,
     reset,
+    getValues,
     setValue,
     control,
     formState: { errors },
@@ -35,9 +38,19 @@ export default function AddProduct({ eventHide, getProducts, action, tempProduct
     defaultValue: defaultData.imageUrl
   });
 
+  const watchImagesUrl = useWatch({
+    control,
+    name: "imagesUrl",
+    defaultValue: defaultData.imagesUrl
+  });  
+
   useEffect(() => {
     if (action === 'edit') {
-      reset(tempProduct)
+      if (tempProduct.imagesUrl === undefined){
+        reset({ ...tempProduct, imagesUrl: [] })
+      }else{
+        reset(tempProduct)
+      }
     }else{
       reset(defaultData);
     }
@@ -83,7 +96,19 @@ export default function AddProduct({ eventHide, getProducts, action, tempProduct
       alert('上傳檔案失敗'+error)
     }
   }
+
+  const handleAddImages =()=>{
+    let imgs = getValues('imagesUrl');
+    let new_imgs = [...imgs, imagesPath];
+    setValue('imagesUrl',new_imgs);
+  }
   
+  const handleRemoveImages = (i) => {
+    let imgs = getValues('imagesUrl');
+    let new_imgs = imgs.filter((item, index) => index !== i);
+    setValue('imagesUrl', new_imgs);
+  }
+
   return (
     <form onSubmit={handleSubmit(save)}>
       <div className='modal fade' tabIndex='-1' id='addModal'>
@@ -98,13 +123,17 @@ export default function AddProduct({ eventHide, getProducts, action, tempProduct
               <div className='row'>
                 <div className='col-sm-4'>
                   * 圖片
-                  <img
-                    src={watchImageUrl}
-                    className={watchImageUrl ? 'card-img-top primary-image' : 'd-none'}
-                    alt='主圖'
-                  />
-                  <div className='form-group mb-2'>
-                    <label className='w-100' htmlFor='image'>
+                  <select className="form-select mb-2" name="imageType" onChange={(e) => setImageType(e.target.value)}>
+                    <option value="imageUrl">主圖</option>
+                    <option value="imagesUrl">小圖</option>
+                  </select>
+                  <div className={`form-group ${imageType === 'imageUrl' ? 'd-block' : 'd-none'}`}>
+                    <img
+                      src={watchImageUrl}
+                      className={watchImageUrl ? 'card-img-top primary-image' : 'd-none'}
+                      alt='主圖'
+                    />
+                    <label className="w-100 mb-2" htmlFor='image'>
                       <input
                         type='text'
                         placeholder="輸入圖片網址"
@@ -117,10 +146,7 @@ export default function AddProduct({ eventHide, getProducts, action, tempProduct
                         })}
                       />
                     </label>
-                  </div>
-                  <div className='form-group mb-2'>
-                    <label className='w-100' htmlFor='customFile'>
-                      或 上傳圖片
+                    <label className="w-100 mb-2" htmlFor='customFile'>
                       <input
                         type='file'
                         id='customFile'
@@ -128,7 +154,32 @@ export default function AddProduct({ eventHide, getProducts, action, tempProduct
                         className='form-control'
                         onChange={(e) => uploadFile(e)}
                       />
+                    </label>                    
+                  </div>
+                  
+                  <div className={`form-group ${imageType === 'imagesUrl' ? 'd-block' : 'd-none'}`}>
+                    <label className="w-100 mb-2 input-group" htmlFor="images">
+                      <input
+                        type='text'
+                        placeholder="輸入圖片網址"
+                        className="form-control"
+                        onChange={(e) => setImagesPath(e.target.value)}
+                      />
+                      <button type="button" className="btn btn-primary" onClick={()=>handleAddImages()}> + </button>
                     </label>
+                      已新增圖片路徑:
+                    <ul className="list-group">
+                      {
+                        watchImagesUrl.map((item, index) => (
+                          <li key={index} className="list-group-item p-0 overflow-auto d-flex">
+                            <button type="button" className="btn btn-danger btn-sm rounded-0" onClick={() => handleRemoveImages(index)}>
+                              <span className="material-symbols-outlined fs-6">delete</span>
+                            </button>
+                            <span className="p-2">{item}</span>
+                          </li>
+                        ))
+                      }
+                    </ul>
                   </div>
                   
                 </div>
@@ -185,6 +236,7 @@ export default function AddProduct({ eventHide, getProducts, action, tempProduct
                       <label className='w-100' htmlFor='origin_price'>
                         * 原價
                         <input
+                          min="0"
                           type='number'
                           className={`form-control ${errors.origin_price && "is-invalid"}`}
                           {...register("origin_price", {
@@ -205,6 +257,7 @@ export default function AddProduct({ eventHide, getProducts, action, tempProduct
                       <label className='w-100' htmlFor='price'>
                         * 售價
                         <input
+                          min="0"
                           type='number'
                           className={`form-control ${errors.price && "is-invalid"}`}
                           {...register("price", {

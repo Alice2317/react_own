@@ -113,7 +113,9 @@ export default function Coupons() {
                     <td>{item.title}</td>
                     <td>{item.percent}%</td>
                     <td>{dateFormat(true, item.due_date)}</td>
-                    <td>{item.is_enabled}</td>
+                    <td className={!item.is_enabled ? "text-danger" : ""}>
+                      {item.is_enabled ? "啟用" : "未啟用"}
+                    </td>
                     <td>
                       <button
                         type="button"

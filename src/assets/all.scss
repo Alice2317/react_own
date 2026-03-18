@@ -1,7 +1,8 @@
 @import "bootstrap/scss/functions";
+@import './vendors/boostrap/variables';
+@import "bootstrap/scss/mixins";
 
-@import 'base/base';
-@import 'vendors/boostrap/variables';
+@import './base/base';
 @import './pages/custom';
 
 @import "bootstrap/scss/bootstrap";

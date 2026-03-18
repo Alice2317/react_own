@@ -124,7 +124,7 @@ export default function Checkout() {
                     errors={errors}
                     id='email'
                     labelText='Email'
-                    type='text'
+                    type='email'
                     rules={{
                       required: {
                         value: true,
@@ -278,6 +278,7 @@ export default function Checkout() {
               {state.carts?.map((item) => (
                 <div className='d-flex mt-2' key={item.id}>
                   <img
+                    alt={item.product.title}
                     src={item.product.imageUrl}
                     className='me-2 w-160'
                   />

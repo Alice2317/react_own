@@ -87,6 +87,7 @@ export default function AddCoupon({ eventHide, getCoupons, action, tempCoupon, d
                     折扣（%）
                     <div className="input-group mt-1">
                       <input
+                        min="0"
                         type='number'
                         className={`form-control ${errors.percent && "is-invalid"}`}
                         {...register("percent", {
