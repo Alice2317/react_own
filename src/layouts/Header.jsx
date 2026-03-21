@@ -124,7 +124,7 @@ export default function Header() {
               </li>
             </ul>
           </div>
-          <div className='d-none d-lg-flex'>
+          <div className='d-flex'>
             {!isAuth ? (
               <Link className='btn' to='/login'>
                 <i className="bi bi-person-circle"></i>

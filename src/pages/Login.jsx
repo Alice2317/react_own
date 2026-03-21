@@ -27,7 +27,8 @@ export default function Login() {
   const [isAdminLoading,setAdminLoading] = useState(true);
   const [isCheck,setCheck] = useState(false);
   const { state } = location;
-  const isAdmin = state.key === 'admin';
+  const isAdmin = state !== null&&state.key === 'admin';
+  
   
   const navigate = useNavigate();
     const {
